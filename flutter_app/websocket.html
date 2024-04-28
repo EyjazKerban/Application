@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.io Test</title>
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const serverUrl = "http://192.168.100.203:3000";
+        const socket = io(serverUrl, {
+          transports: ["websocket"],
+        });
+
+        socket.on("connect", () => {
+          console.log("Connected to server");
+          socket.emit("joinRoom", { chatRoomId: "YourChatRoomId" }); // Update YourChatRoomId accordingly
+        });
+
+        socket.on("newMessage", (message) => {
+          console.log("New message:", message);
+          const messagesContainer = document.getElementById("messages");
+          const msgElement = document.createElement("li");
+          msgElement.textContent = message.content; // Assuming message object has content
+          messagesContainer.appendChild(msgElement);
+        });
+
+        document
+          .getElementById("sendButton")
+          .addEventListener("click", function () {
+            const messageContent =
+              document.getElementById("messageInput").value;
+            socket.emit("sendMessage", {
+              chatRoomId: "YourChatRoomId", // Update YourChatRoomId accordingly
+              userId: "YourUserId", // Update YourUserId accordingly
+              content: messageContent,
+            });
+            document.getElementById("messageInput").value = ""; // Clear input after sending
+          });
+
+        socket.on("disconnect", () => {
+          console.log("Disconnected from server");
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h2>Socket.io Test</h2>
+    <input type="text" id="messageInput" placeholder="Type a message..." />
+    <button id="sendButton">Send Message</button>
+    <ul id="messages"></ul>
+  </body>
+</html>
